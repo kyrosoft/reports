@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyro Reports</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kyro Reports</h1>
+            <nav>
+                <button id="tabCreator" class="active">Template Creator</button>
+                <button id="tabCompiler">Compiler</button>
+            </nav>
+        </header>
+
+        <main id="creatorSection">
+            <section class="section">
+                <h2>Create Template</h2>
+                <input type="text" id="templateName" placeholder="Template name">
+                <div id="fieldsContainer">
+                    <input type="text" class="field-input" placeholder="Field name">
+                </div>
+                <button onclick="addField()">+ Add Field</button>
+                <button onclick="createTemplate()">Download Template</button>
+            </section>
+        </main>
+
+        <main id="compilerSection" class="hidden">
+            <section class="section">
+                <h2>1. Upload Template</h2>
+                <div class="drop-zone" id="templateDropZone">
+                    <input type="file" id="templateInput" accept=".xlsx" hidden>
+                    <p>Drop template .xlsx or click to browse</p>
+                </div>
+                <div id="templateInfo" class="file-info hidden"></div>
+            </section>
+
+            <section class="section">
+                <h2>2. Upload Reports</h2>
+                <div class="drop-zone" id="reportsDropZone">
+                    <input type="file" id="reportsInput" accept=".xlsx" multiple hidden>
+                    <p>Drop report .xlsx files or click to browse</p>
+                </div>
+                <div id="reportsList" class="hidden"></div>
+            </section>
+
+            <section class="section">
+                <button id="compileBtn" class="compile-btn" disabled>Compile</button>
+            </section>
+
+            <div id="progressSection" class="hidden">
+                <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
+            </div>
+
+            <div id="downloadSection" class="download-section hidden">
+                <p>Compilation Complete!</p>
+                <button id="downloadBtn" class="download-btn">Download</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

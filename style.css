@@ -1,0 +1,150 @@
+body {
+    font-family: system-ui, sans-serif;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+nav button {
+    flex: 1;
+    padding: 12px;
+    font-size: 15px;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+nav button.active {
+    background: #2563eb;
+    color: white;
+}
+
+.section {
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.drop-zone {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    background: #fafafa;
+}
+
+.drop-zone:hover, .drop-zone.drag-over {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.file-info, .file-item {
+    padding: 10px;
+    background: #f0fdf4;
+    border-radius: 6px;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.file-remove {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+button.compile-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button.compile-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 10px;
+    background: #e5e7eb;
+    border-radius: 5px;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #2563eb;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.download-section {
+    text-align: center;
+    padding: 20px;
+    background: #f0fdf4;
+    border-radius: 8px;
+}
+
+.download-btn {
+    padding: 15px 30px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#templateName, .field-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.section button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    margin-top: 10px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.section button:hover {
+    background: #1d4ed8;
+}
+
+.hidden {
+    display: none;
+}

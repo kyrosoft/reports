@@ -1,26 +1,37 @@
 // Template Creator
 
-// Status bar functions
-function showStatus(message, type = 'info') {
-    const statusBar = document.getElementById('statusBar');
-    const statusMessage = document.getElementById('statusMessage');
+// Toast notification system
+function showToast(message, type = 'error') {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
 
-    statusBar.className = 'status-bar';
-    if (type === 'error') {
-        statusBar.classList.add('error');
-    } else if (type === 'success') {
-        statusBar.classList.add('success');
-    }
+    container.appendChild(toast);
 
-    statusMessage.textContent = message;
-
-    // Auto-clear after 5 seconds for info/success
-    if (type !== 'error') {
+    // Auto-remove after 3 seconds
+    setTimeout(() => {
+        toast.classList.add('toast-fade-out');
         setTimeout(() => {
-            showStatus('Ready');
-        }, 5000);
-    }
+            toast.remove();
+        }, 300);
+    }, 3000);
 }
+
+// Status bar functions (no-op - status bar removed)
+function showStatus(message, type = 'info') {
+    // Status bar removed - do nothing
+}
+
+// Show compile errors/warnings as toast
+function showCompileErrors(errors) {
+    if (errors.length === 0) return;
+
+    errors.forEach(err => {
+        showToast(err, 'error');
+    });
+}
+
 
 function parseColumns() {
     const input = document.getElementById('columnName');
@@ -72,7 +83,7 @@ function createTemplate() {
     const columns = parseColumns();
 
     if (columns.length === 0) {
-        showStatus('Add at least one column', 'error');
+        showTemplateErrors(['Please define at least one column']);
         return;
     }
 
@@ -87,7 +98,15 @@ function createTemplate() {
 
     // Download
     XLSX.writeFile(wb, 'Template - KyroReports.xlsx');
-    showStatus('Template downloaded successfully', 'success');
+    showToast('Template downloaded successfully', 'success');
+}
+
+function showTemplateErrors(errors) {
+    if (errors.length === 0) return;
+
+    errors.forEach(err => {
+        showToast(err, 'error');
+    });
 }
 
 // Utility to extract xlsx files from zip
@@ -118,28 +137,26 @@ function validateExcelFile(arrayBuffer) {
         return {
             valid: wb.SheetNames.length > 0,
             sheets: wb.SheetNames.length,
-            sheetNames: wb.SheetNames
+            sheetNames: wb.SheetNames,
+            workbook: wb
         };
     } catch {
-        return { valid: false, sheets: 0, sheetNames: [] };
+        return { valid: false, sheets: 0, sheetNames: [], workbook: null };
     }
 }
 
 // Validate and Compile Section
 let templateFile = null;
 let reportFiles = [];
-let validationComplete = false;
 let compiledWorkbook = null;
 
-const validateBtn = document.getElementById('validateBtn');
-const compileBtn = document.getElementById('compileBtn');
 const downloadBtn = document.getElementById('downloadBtn');
 
 document.getElementById('templateInput').onchange = async (e) => setTemplate(e.target.files[0]);
 
 async function setTemplate(file) {
     if (!file || !file.name.toLowerCase().endsWith('.xlsx')) {
-        showCompileError('Template must be a .xlsx file');
+        showToast('Template must be a .xlsx file', 'error');
         return;
     }
 
@@ -148,7 +165,7 @@ async function setTemplate(file) {
         const validation = validateExcelFile(content);
 
         if (!validation.valid) {
-            showCompileError('Invalid Excel file');
+            showToast('Invalid Excel file', 'error');
             return;
         }
 
@@ -157,28 +174,15 @@ async function setTemplate(file) {
             content: content
         };
     } catch (err) {
-        showCompileError('Failed to read file');
+        showToast('Failed to read file', 'error');
         return;
     }
 
     document.getElementById('templateInfo').innerHTML =
         `<b>${templateFile.name}</b> (${size(templateFile.content.byteLength)})`;
     document.getElementById('templateInfo').classList.remove('hidden');
-    clearCompileErrors();
-    updateButtons();
 }
 
-function showCompileError(msg) {
-    showStatus(msg, 'error');
-    const el = document.getElementById('validationErrors');
-    el.textContent = msg;
-    el.classList.remove('hidden');
-}
-
-function clearCompileErrors() {
-    showStatus('Ready');
-    document.getElementById('validationErrors').classList.add('hidden');
-}
 
 // Reports upload
 document.getElementById('reportsInput').onchange = async (e) => {
@@ -186,7 +190,7 @@ document.getElementById('reportsInput').onchange = async (e) => {
     if (!file) return;
 
     if (!file.name.toLowerCase().endsWith('.zip')) {
-        showCompileError(`${file.name} is not a .zip file`);
+        showToast(`${file.name} is not a .zip file`, 'error');
         return;
     }
 
@@ -196,7 +200,7 @@ document.getElementById('reportsInput').onchange = async (e) => {
     try {
         const xlsxFiles = await extractXlsxFromZip(file);
         if (xlsxFiles.length === 0) {
-            showCompileError(`No .xlsx files found in ${file.name}`);
+            showToast(`No .xlsx files found in ${file.name}`, 'error');
             return;
         }
 
@@ -207,22 +211,17 @@ document.getElementById('reportsInput').onchange = async (e) => {
                 valid: validation.valid,
                 sheets: validation.sheets,
                 sheetNames: validation.sheetNames,
+                workbook: validation.workbook,
                 originalName: file.name
             });
         }
     } catch (err) {
-        showCompileError(`Failed to read ${file.name}`);
+        showToast(`Failed to read ${file.name}`, 'error');
         return;
     }
 
     renderReports();
-    clearCompileErrors();
-
-    // Reset validation state when new files are added
-    validationComplete = false;
-    document.getElementById('validationSummary').classList.add('hidden');
-    updateButtons();
-};
+}
 
 function renderReports() {
     const list = document.getElementById('reportsList');
@@ -247,102 +246,134 @@ function renderReports() {
 function removeReport(i) {
     reportFiles.splice(i, 1);
     renderReports();
-
-    // Reset validation state when files are removed
-    validationComplete = false;
-    document.getElementById('validationSummary').classList.add('hidden');
-    updateButtons();
 }
 
-// Validate button
-validateBtn.onclick = () => {
-    const validCount = reportFiles.filter(r => r.valid).length;
-    const invalidCount = reportFiles.length - validCount;
+// Get template sheet name and columns
+function getTemplateInfo() {
+    if (!templateFile) return null;
 
-    let summary = `<div class="validation-summary"><h4>Validation Results</h4>`;
-    summary += `<p><strong>Total Files:</strong> ${reportFiles.length}</p>`;
-    summary += `<p style="color: #10b981;"><strong>Valid:</strong> ${validCount}</p>`;
-    summary += `<p style="color: #ef4444;"><strong>Invalid:</strong> ${invalidCount}</p>`;
+    const wb = XLSX.read(templateFile.content, { type: 'array' });
+    const sheetName = wb.SheetNames[0];
+    const ws = wb.Sheets[sheetName];
+    const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-    if (invalidCount > 0) {
-        summary += '<p><strong>Invalid Files:</strong></p><ul>';
-        reportFiles.filter(f => !f.valid).forEach(f => {
-            summary += `<li>${f.file.name}</li>`;
-        });
-        summary += '</ul>';
+    if (data.length === 0) return null;
+
+    return {
+        sheetName: sheetName,
+        columns: data[0], // First row as columns
+        data: data
+    };
+}
+
+// Compile & Download button
+downloadBtn.onclick = async () => {
+    const errors = [];
+
+    // Check if template is selected
+    if (!templateFile) {
+        errors.push('Please upload a template file');
     }
 
-    summary += '<p><strong>All Files:</strong></p><ul>';
-    reportFiles.forEach(f => {
-        summary += `<li>${f.file.name} - ${f.valid ? '✓' : '✗'} (${f.sheets} sheets)</li>`;
-    });
-    summary += '</ul></div>';
-
-    document.getElementById('validationSummary').innerHTML = summary;
-    document.getElementById('validationSummary').classList.remove('hidden');
-
-    validationComplete = true;
-    updateButtons();
-
-    if (invalidCount > 0) {
-        showStatus(`Validation complete: ${validCount} valid, ${invalidCount} invalid files`, 'error');
-    } else {
-        showStatus(`Validation complete: All ${validCount} files are valid`, 'success');
+    // Check if reports ZIP is selected
+    if (reportFiles.length === 0) {
+        errors.push('Please upload a reports ZIP file');
     }
-};
 
-// Compile button
-compileBtn.onclick = async () => {
-    if (!validationComplete) return;
+    // If basic checks pass, validate file contents
+    if (errors.length === 0 && templateFile && reportFiles.length > 0) {
+        const templateInfo = getTemplateInfo();
+        if (!templateInfo) {
+            errors.push('Template file is empty or invalid');
+        } else {
+            // Check each report file
+            for (const report of reportFiles) {
+                const validation = {
+                    valid: report.valid,
+                    sheets: report.sheets,
+                    sheetNames: report.sheetNames,
+                    workbook: report.workbook
+                };
 
-    compileBtn.disabled = true;
+                if (!validation.valid) {
+                    errors.push(`${report.file.name}: Invalid Excel file`);
+                    continue;
+                }
+
+                // Check if template sheet name exists in report
+                if (!validation.sheetNames.includes(templateInfo.sheetName)) {
+                    errors.push(`${report.file.name}: Sheet "${templateInfo.sheetName}" not found. Available sheets: ${validation.sheetNames.join(', ')}`);
+                    continue;
+                }
+
+                // Check columns match
+                const wb = validation.workbook;
+                const ws = wb.Sheets[templateInfo.sheetName];
+                const reportData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+                if (reportData.length === 0) {
+                    errors.push(`${report.file.name}: Sheet is empty`);
+                    continue;
+                }
+
+                const reportColumns = reportData[0];
+                const templateCols = templateInfo.columns;
+
+                // Compare columns
+                const templateColsStr = templateCols.map(c => String(c).trim()).join(',');
+                const reportColsStr = reportColumns.map(c => String(c).trim()).join(',');
+
+                if (templateColsStr !== reportColsStr) {
+                    errors.push(`${report.file.name}: Columns do not match template. Expected: "${templateColsStr}", Found: "${reportColsStr}"`);
+                }
+            }
+        }
+    }
+
+    // Show errors if any
+    if (errors.length > 0) {
+        showCompileErrors(errors);
+        return;
+    }
+
+    // Clear errors and proceed with compilation
+    downloadBtn.disabled = true;
     document.getElementById('progressSection').classList.remove('hidden');
     showStatus('Compiling reports...');
 
     const bar = document.getElementById('progressFill');
-    const validReports = reportFiles.filter(r => r.valid);
-    const total = validReports.length;
-
-    // Read template
+    const templateInfo = getTemplateInfo();
     const templateWb = XLSX.read(templateFile.content, { type: 'array' });
     const newWb = XLSX.utils.book_new();
 
-    // Copy template sheets
-    templateWb.SheetNames.forEach(name => {
-        const ws = templateWb.Sheets[name];
-        XLSX.utils.book_append_sheet(newWb, ws, name);
-    });
+    // Copy template sheets (header only)
+    const templateWs = templateWb.Sheets[templateInfo.sheetName];
+    const allData = [templateInfo.columns]; // Start with header row
 
     // Append data from each report
-    for (let i = 0; i < total; i++) {
-        const { file } = validReports[i];
-        const wb = XLSX.read(file.content, { type: 'array' });
+    for (let i = 0; i < reportFiles.length; i++) {
+        const report = reportFiles[i];
+        const ws = report.workbook.Sheets[templateInfo.sheetName];
+        const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-        // Add each sheet with report name prefix
-        wb.SheetNames.forEach(name => {
-            const ws = wb.Sheets[name];
-            const baseName = file.name.replace('.xlsx', '');
-            const newSheetName = `${baseName} - ${name}`;
-            XLSX.utils.book_append_sheet(newWb, ws, newSheetName);
-        });
+        // Skip header row and append data rows
+        for (let j = 1; j < data.length; j++) {
+            allData.push(data[j]);
+        }
 
-        bar.style.width = ((i + 1) / total * 100) + '%';
+        bar.style.width = ((i + 1) / reportFiles.length * 100) + '%';
     }
 
-    compiledWorkbook = newWb;
+    // Create compiled sheet with all data
+    const compiledWs = XLSX.utils.aoa_to_sheet(allData);
+    XLSX.utils.book_append_sheet(newWb, compiledWs, templateInfo.sheetName);
 
     document.getElementById('progressSection').classList.add('hidden');
-    compileBtn.disabled = false;
-    updateButtons();
-    showStatus(`Compilation complete: ${total} files compiled`, 'success');
-};
 
-// Download button
-downloadBtn.onclick = () => {
-    if (compiledWorkbook) {
-        XLSX.writeFile(compiledWorkbook, 'compiled_reports.xlsx');
-        showStatus('Report downloaded successfully', 'success');
-    }
+    // Download the compiled workbook
+    XLSX.writeFile(newWb, 'compiled_reports.xlsx');
+    showToast('Report compiled and downloaded successfully', 'success');
+    downloadBtn.disabled = false;
 };
 
 function size(bytes) {
@@ -350,18 +381,4 @@ function size(bytes) {
     const units = ['B', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + units[i];
-}
-
-function updateButtons() {
-    const hasTemplate = !!templateFile;
-    const hasReports = reportFiles.length > 0;
-
-    // Enable Validate when template and reports are loaded
-    validateBtn.disabled = !(hasTemplate && hasReports);
-
-    // Enable Compile when validation is complete
-    compileBtn.disabled = !validationComplete;
-
-    // Enable Download when compilation is complete
-    downloadBtn.disabled = !compiledWorkbook;
 }

@@ -14,40 +14,32 @@
         <div class="navbar-brand">Kyro Reports</div>
     </nav>
 
+    <!-- Toast notification container -->
+    <div id="toastContainer"></div>
+
     <div class="container">
         <section id="compile">
 
         <section>
             <h2>Validate and Compile Reports</h2>
 
-            <div class="two-columns">
-                <div class="column">
-                    <div class="upload-section">
-                        <h3>1. Upload Template <span class="info-text-small">(Template: .xlsx file)</span></h3>
-                        <input type="file" id="templateInput" accept=".xlsx">
-                        <div id="templateInfo" class="file-info hidden"></div>
-                    </div>
+            <div class="upload-section">
+                <h3>1. Upload Template <span class="info-text-small">(Template: .xlsx file)</span></h3>
+                <input type="file" id="templateInput" accept=".xlsx">
+                <div id="templateInfo" class="file-info hidden"></div>
+            </div>
 
-                    <div class="upload-section">
-                        <h3>2. Upload Reports ZIP <span class="info-text-small">(Reports: .zip file containing multiple .xlsx files)</span></h3>
-                        <input type="file" id="reportsInput" accept=".zip">
-                        <div id="reportsList" class="hidden"></div>
-                        <div id="validationErrors" class="validation-errors hidden"></div>
-                    </div>
+            <div class="upload-section">
+                <h3>2. Upload Reports ZIP <span class="info-text-small">(Reports: .zip file containing multiple .xlsx files)</span></h3>
+                <input type="file" id="reportsInput" accept=".zip">
+                <div id="reportsList" class="hidden"></div>
+            </div>
+
+            <div class="process-section">
+                <div id="progressSection" class="hidden">
+                    <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
                 </div>
-
-                <div class="column">
-                    <h3>3. Process</h3>
-                    <button id="validateBtn" class="process-btn" disabled>Validate</button>
-                    <div id="validationSummary" class="hidden"></div>
-
-                    <button id="compileBtn" class="process-btn" disabled>Compile</button>
-                    <div id="progressSection" class="hidden">
-                        <div class="progress-bar"><div id="progressFill" class="progress-fill"></div></div>
-                    </div>
-
-                    <button id="downloadBtn" class="process-btn download-btn" disabled>Download</button>
-                </div>
+                <button id="downloadBtn" class="process-btn download-btn">COMPILE & DOWNLOAD XLSX</button>
             </div>
         </section>
 
@@ -58,21 +50,9 @@
 
             <div id="columnsPreview" class="preview full-width"></div>
 
-            <div class="two-columns sidebar">
-                <div class="column">
-                    <h3>Columns (separated by commas)</h3>
-                    <input type="text" id="columnName" placeholder="Column1, Column2, Column3">
-                </div>
-
-                <div class="column">
-                    <button onclick="createTemplate()" class="process-btn download-btn">Download</button>
-                </div>
-            </div>
+            <textarea id="columnName" rows="3" placeholder="Column1, Column2, Column3"></textarea>
+            <button onclick="createTemplate()" class="process-btn download-btn">DOWNLOAD TEMPLATE XLSX</button>
         </section>
-    </div>
-
-    <div class="status-bar" id="statusBar">
-        <span id="statusMessage">Ready</span>
     </div>
 
     <script src="app.js"></script>

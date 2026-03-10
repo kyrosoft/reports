@@ -94,6 +94,24 @@ function createTemplate() {
     const data = [columns]; // Header row with column names
 
     const wsData = XLSX.utils.aoa_to_sheet(data);
+
+    // Apply styling to header row (bold, centered)
+    const range = XLSX.utils.decode_range(wsData['!ref']);
+    for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+        if (!wsData[cellAddress]) continue;
+        wsData[cellAddress].s = {
+            font: { bold: true },
+            alignment: { horizontal: 'center', vertical: 'center' }
+        };
+    }
+
+    // Auto-fit column widths based on header content
+    const colWidths = columns.map(col => ({
+        wch: Math.max(col.length + 2, 10) // Minimum width of 10
+    }));
+    wsData['!cols'] = colWidths;
+
     XLSX.utils.book_append_sheet(wb, wsData, 'KyroReports');
 
     // Download
@@ -410,9 +428,10 @@ downloadBtn.onclick = async () => {
     const templateWb = XLSX.read(templateFile.content, { type: 'array' });
     const newWb = XLSX.utils.book_new();
 
-    // Copy template sheets (header only)
-    const templateWs = templateWb.Sheets[templateInfo.sheetName];
-    const allData = [templateInfo.columns]; // Start with header row
+    // Copy template sheets (header only) with "No." as first column
+    const headerRow = ['No.', ...templateInfo.columns];
+    const allData = [headerRow]; // Start with header row
+    let rowNum = 1;
 
     // Append data from each report
     for (let i = 0; i < reportFiles.length; i++) {
@@ -420,9 +439,9 @@ downloadBtn.onclick = async () => {
         const ws = report.workbook.Sheets[templateInfo.sheetName];
         const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
-        // Skip header row and append data rows
+        // Skip header row and append data rows with row number
         for (let j = 1; j < data.length; j++) {
-            allData.push(data[j]);
+            allData.push([rowNum++, ...data[j]]);
         }
 
         bar.style.width = ((i + 1) / reportFiles.length * 100) + '%';
@@ -430,12 +449,30 @@ downloadBtn.onclick = async () => {
 
     // Create compiled sheet with all data
     const compiledWs = XLSX.utils.aoa_to_sheet(allData);
+
+    // Apply styling to header row (bold, centered)
+    const range = XLSX.utils.decode_range(compiledWs['!ref']);
+    for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+        if (!compiledWs[cellAddress]) continue;
+        compiledWs[cellAddress].s = {
+            font: { bold: true },
+            alignment: { horizontal: 'center', vertical: 'center' }
+        };
+    }
+
+    // Auto-fit column widths
+    const colWidths = headerRow.map(col => ({
+        wch: Math.max(String(col).length + 2, 10)
+    }));
+    compiledWs['!cols'] = colWidths;
+
     XLSX.utils.book_append_sheet(newWb, compiledWs, templateInfo.sheetName);
 
     document.getElementById('progressSection').classList.add('hidden');
 
     // Download the compiled workbook
-    XLSX.writeFile(newWb, 'compiled_reports.xlsx');
+    XLSX.writeFile(newWb, 'Compiled - KyroReports.xlsx');
     showToast('Report compiled and downloaded successfully', 'success');
     downloadBtn.disabled = false;
 };

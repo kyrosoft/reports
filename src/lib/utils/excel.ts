@@ -42,7 +42,7 @@ export function getTemplateInfo(templateFile: TemplateFile): TemplateInfo | null
 	const wb = XLSX.read(templateFile.content, { type: 'array' });
 	const sheetName = wb.SheetNames[0];
 	const ws = wb.Sheets[sheetName];
-	const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+	const data: any = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
 	if (data.length === 0) return null;
 
@@ -68,7 +68,7 @@ export function createExcelWorkbook(
 	const wb = XLSX.utils.book_new();
 	const data = [columns];
 
-	const wsData = XLSX.utils.aoa_to_sheet(data);
+	const wsData: any = XLSX.utils.aoa_to_sheet(data);
 
 	// Apply styling to header row
 	const range = XLSX.utils.decode_range(wsData['!ref']);
@@ -106,7 +106,7 @@ export function compileReports(
 	for (let i = 0; i < reportFiles.length; i++) {
 		const report = reportFiles[i];
 		const ws = report.workbook.Sheets[templateInfo.sheetName];
-		const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+		const data: any = XLSX.utils.sheet_to_json(ws, { header: 1 });
 
 		for (let j = 1; j < data.length; j++) {
 			allData.push([rowNum++, ...data[j]]);
@@ -115,7 +115,7 @@ export function compileReports(
 		onProgress(((i + 1) / reportFiles.length) * 100);
 	}
 
-	const compiledWs = XLSX.utils.aoa_to_sheet(allData);
+	const compiledWs: any = XLSX.utils.aoa_to_sheet(allData);
 
 	// Apply styling to header row
 	const range = XLSX.utils.decode_range(compiledWs['!ref']);

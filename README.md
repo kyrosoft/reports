@@ -1,42 +1,67 @@
-# sv
+# Kyro Reports
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+A client-side web application for creating Excel templates and compiling multiple reports into a single consolidated document. No backend server required – all processing happens in your browser.
 
-## Creating a project
+## Features
 
-If you're seeing this, you've probably already done this step. Congrats!
+- **Template Creator**: Define custom column names and generate formatted .xlsx templates with styled headers
+- **Report Compiler**: Upload a template and multiple reports (via ZIP), validate them, and compile into a single Excel file
+- **Validation**: Automatic validation ensures all reports match the template structure (sheet names and columns)
+- **Progress Tracking**: Visual progress bar during compilation
+- **Toast Notifications**: Real-time feedback for success and error states
+- **Auto-numbering**: Compiled reports include sequential row numbers for easy reference
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## How It Works
 
-To recreate this project with the same configuration:
+Kyro Reports runs entirely in the browser using:
+- `xlsx-js-style` – Excel file generation and manipulation
+- `JSZip` – ZIP archive handling for bulk report uploads
 
-```sh
-# recreate this project
-npx sv@0.12.5 create --template minimal --types ts --add tailwindcss="plugins:none" sveltekit-adapter="adapter:static" --install npm kyroreports
-```
+### Template Creator
 
-## Developing
+1. Enter column names separated by commas (e.g., `Name, Email, Phone, Department`)
+2. Preview the table structure in real-time
+3. Click **DOWNLOAD TEMPLATE XLSX** to generate a formatted Excel file
+4. Distribute the template to users for data collection
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+### Report Compiler
 
-```sh
+1. Upload the original template .xlsx file
+2. Upload a ZIP archive containing multiple filled report files (.xlsx)
+3. The app validates each report against the template:
+   - Checks sheet names match
+   - Verifies column headers are identical
+4. Click **DOWNLOAD COMPILED XLSX** to merge all reports into one file with:
+   - Original headers with "No." as the first column
+   - Sequential row numbers for each data row
+   - Styled header row (bold, centered)
+
+## Installation
+
+### Using npm
+
+```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
+# Build for production
 npm run build
 ```
 
-You can preview the production build with `npm run preview`.
+### Standalone Usage
 
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+Simply open `index.html` in a modern web browser. No build process required.
+
+## Browser Compatibility
+
+Requires a modern browser with ES6+ support:
+- Chrome/Edge 90+
+- Firefox 88+
+- Safari 14+
+
+## License
+
+See [LICENSE](LICENSE) file for details.

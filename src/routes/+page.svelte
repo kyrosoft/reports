@@ -26,7 +26,7 @@
 
 	<Navbar />
 
-	<div class="max-w-[1200px] mx-auto px-3 pb-10">
+	<div class="max-w-300 mx-auto px-3 pb-10">
 		<CompileReport bind:templateFile bind:reportFiles />
 		<ValidateReport bind:validateTemplateFile bind:validateReportFile bind:validationResult />
 		<TemplateReport />

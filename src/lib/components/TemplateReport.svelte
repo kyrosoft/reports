@@ -86,7 +86,7 @@
 		Template Report
 	</h2>
 
-	<div class="px-4 pt-3.5">
+	<div class="px-4 pt-4 pb-4">
 		<div class="w-full">
 			<div class="my-2 px-2 py-2 border border-gray-300 rounded-md bg-gray-50 overflow-x-auto overflow-y-visible">
 				<div class="inline-flex flex-nowrap gap-0 items-center p-0 min-w-max">

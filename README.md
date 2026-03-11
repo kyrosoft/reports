@@ -1,6 +1,6 @@
 # Kyro Reports
 
-A client-side web application for creating Excel templates and compiling multiple reports into a single consolidated document. No backend server required – all processing happens in your browser.
+A modern web application for creating Excel templates and compiling multiple reports into a single consolidated document. Built with SvelteKit and runs entirely in the browser – no backend server required.
 
 ## Features
 
@@ -10,17 +10,73 @@ A client-side web application for creating Excel templates and compiling multipl
 - **Progress Tracking**: Visual progress bar during compilation
 - **Toast Notifications**: Real-time feedback for success and error states
 - **Auto-numbering**: Compiled reports include sequential row numbers for easy reference
+- **Responsive Design**: Clean UI built with Tailwind CSS
+
+## Tech Stack
+
+- **Framework**: SvelteKit with Svelte 5
+- **Styling**: Tailwind CSS v4
+- **Excel Processing**: `xlsx-js-style` – Excel file generation and manipulation with styling support
+- **ZIP Handling**: `JSZip` – ZIP archive handling for bulk report uploads
+- **TypeScript**: Fully typed codebase for better developer experience
+
+## Project Structure
+
+```
+src/
+├── lib/
+│   ├── components/          # Svelte components
+│   │   ├── CompileReport.svelte
+│   │   ├── ValidateReport.svelte
+│   │   ├── TemplateReport.svelte
+│   │   ├── ToastContainer.svelte
+│   │   └── Navbar.svelte
+│   ├── utils/              # Utility functions
+│   │   ├── excel.ts        # Excel operations
+│   │   └── toast.ts        # Toast notifications
+│   ├── types.ts            # TypeScript types
+│   └── assets/             # Static assets
+├── routes/
+│   ├── +layout.svelte       # Root layout
+│   ├── +layout.css          # Global styles
+│   └── +page.svelte         # Main page
+```
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd kyroreports
+
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+The application will be available at `http://localhost:5173` (or another port if 5173 is in use).
 
 ## How It Works
 
-Kyro Reports runs entirely in the browser using:
-- `xlsx-js-style` – Excel file generation and manipulation
-- `JSZip` – ZIP archive handling for bulk report uploads
-
 ### Template Creator
 
-1. Enter column names separated by commas (e.g., `Name, Email, Phone, Department`)
-2. Preview the table structure in real-time
+1. Enter column names using the interactive input fields
+2. Add, remove, or reorder columns as needed
 3. Click **DOWNLOAD TEMPLATE XLSX** to generate a formatted Excel file
 4. Distribute the template to users for data collection
 
@@ -36,24 +92,11 @@ Kyro Reports runs entirely in the browser using:
    - Sequential row numbers for each data row
    - Styled header row (bold, centered)
 
-## Installation
+### Validate Report
 
-### Using npm
-
-```bash
-# Install dependencies
-npm install
-
-# Run development server
-npm run dev
-
-# Build for production
-npm run build
-```
-
-### Standalone Usage
-
-Simply open `index.html` in a modern web browser. No build process required.
+1. Upload a template .xlsx file
+2. Upload a single report .xlsx file to validate
+3. Get instant feedback on whether the report matches the template structure
 
 ## Browser Compatibility
 
@@ -61,6 +104,16 @@ Requires a modern browser with ES6+ support:
 - Chrome/Edge 90+
 - Firefox 88+
 - Safari 14+
+
+## Development
+
+```bash
+# Run type checking
+npm run check
+
+# Run type checking in watch mode
+npm run check:watch
+```
 
 ## License
 

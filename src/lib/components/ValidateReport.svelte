@@ -125,12 +125,12 @@
 	}
 </script>
 
-<section class="bg-white border border-gray-200 rounded-md mb-4 overflow-hidden shadow-sm pb-4">
+<section class="bg-white border border-gray-200 rounded-md mb-4 overflow-hidden shadow-sm">
 	<h2 class="bg-slate-800 text-white px-4 py-2.5 m-0 text-xs font-semibold tracking-wide">
 		Validate Report
 	</h2>
 
-	<div class="px-4 pt-3.5">
+	<div class="px-4 pt-4 pb-4">
 		<!-- Upload Template -->
 		<div class="mb-3 w-full">
 			<h3 class="text-xs my-1.5 mx-0">

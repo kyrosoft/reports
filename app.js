@@ -213,6 +213,19 @@ function createTemplate() {
         return;
     }
 
+    // Check for empty columns
+    const errors = [];
+    columns.forEach((col, index) => {
+        if (!col || col.trim() === '') {
+            errors.push(`Column ${index + 1} is empty`);
+        }
+    });
+
+    if (errors.length > 0) {
+        showTemplateErrors(errors);
+        return;
+    }
+
     // Create workbook
     const wb = XLSX.utils.book_new();
 

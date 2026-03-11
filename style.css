@@ -82,9 +82,18 @@ h3 {
 }
 
 hr {
-    margin: 16px 0;
-    border: none;
-    border-top: 1px solid #ddd;
+    display: none;
+}
+
+/* Individual sections with darker backgrounds */
+#compile section,
+#validate,
+#template {
+    background: #f5f5f5;
+    padding: 16px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0;
+    margin-bottom: 16px;
 }
 
 .info-text {
@@ -219,7 +228,7 @@ textarea {
     display: inline-flex;
     flex-wrap: nowrap;
     gap: 0;
-    align-items: flex-end;
+    align-items: center;
     padding: 14px 0 2px 0;
     min-width: max-content;
 }
@@ -306,9 +315,9 @@ textarea {
     color: white;
     border: 1px solid #059669;
     border-radius: 3px;
-    width: 22px;
-    height: 28px;
-    font-size: 15px;
+    width: 28px;      /* Same as input height */
+    height: 28px;     /* Same as input height */
+    font-size: 14px;  /* Adjusted for larger button */
     line-height: 1;
     cursor: pointer;
     display: inline-flex;
@@ -319,6 +328,7 @@ textarea {
     margin: 0 0 0 5px;
     min-height: unset;
     transition: background 0.15s;
+    align-self: center;
 }
 
 .add-column-small-btn:hover {

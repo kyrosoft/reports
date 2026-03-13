@@ -3,11 +3,16 @@ import adapter from '@sveltejs/adapter-static';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
   kit: {
-    adapter: adapter(),
-
-    paths: {
-      base: '/kyroreports'
-    }
+    adapter: adapter({
+      pages: 'build',
+      assets: 'build',
+      fallback: undefined,
+      precompress: false,
+      strict: true
+    })
+  },
+  vitePlugin: {
+    dynamicCompileOptions: ({ filename }) => ({ runes: !filename.includes('node_modules') })
   }
 };
 
